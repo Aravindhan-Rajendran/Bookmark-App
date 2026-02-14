@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export type Bookmark = {
@@ -29,7 +29,6 @@ export function BookmarkList({
   onPrependConsumed,
 }: BookmarkListProps) {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(initialBookmarks);
-  const [loading, setLoading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const supabase = createClient();
 
@@ -54,7 +53,7 @@ export function BookmarkList({
       .order("created_at", { ascending: false });
     if (error) return;
     setBookmarks(data ?? []);
-  }, [userId]);
+  }, [userId, supabase]);
 
   // Keep in sync when server sends new initial data (e.g. after refresh or login as different user)
   useEffect(() => {
@@ -82,7 +81,7 @@ export function BookmarkList({
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchBookmarks]);
+  }, [fetchBookmarks, supabase]);
 
   useEffect(() => {
     if (refreshTrigger !== undefined && refreshTrigger > 0) {
@@ -95,12 +94,6 @@ export function BookmarkList({
     await supabase.from("bookmarks").delete().eq("id", id);
     setDeletingId(null);
   };
-
-  if (loading) {
-    return (
-      <p className="text-zinc-500 dark:text-zinc-400">Loading bookmarks…</p>
-    );
-  }
 
   if (bookmarks.length === 0) {
     return (
