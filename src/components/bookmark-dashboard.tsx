@@ -13,7 +13,7 @@ type Props = {
 export function BookmarkDashboard({ userId, initialBookmarks }: Props) {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [prependBookmark, setPrependBookmark] = useState<Bookmark | null>(null);
-  const refetchRef = useRef<() => void>();
+  const refetchRef = useRef<(() => void) | undefined>(undefined);
 
   const handleAdded = (newBookmark: Bookmark) => {
     setPrependBookmark(newBookmark);
